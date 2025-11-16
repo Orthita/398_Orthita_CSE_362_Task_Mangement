@@ -15,6 +15,18 @@ router.get('/', (req, res) => {
   res.status(200).json({ success: true, data: tasks });
 });
 
+// GET task by ID
+router.get('/:id', (req, res) => {
+  const taskId = parseInt(req.params.id); // convert ID from string to number
+  const task = tasks.find(t => t.id === taskId);
+
+  if (!task) {
+    return res.status(404).json({ error: 'Task not found' });
+  }
+
+  res.status(200).json({ success: true, data: task });
+});
+
 // POST a new task
 router.post('/', (req, res) => {
   try {
