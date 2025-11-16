@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// Updated tasks array with 5 tasks
+// Predefined tasks
 let tasks = [
   { id: 1, title: 'Task One', completed: false, priority: 'low', createdAt: new Date() },
   { id: 2, title: 'Task Two', completed: true, priority: 'medium', createdAt: new Date() },
@@ -28,7 +28,6 @@ router.post('/', (req, res) => {
       return res.status(400).json({ success: false, message: 'Title is required' });
     }
 
-    // Default priority to 'low' if not provided
     const newTask = {
       id: Date.now(),
       title: title.trim(),
