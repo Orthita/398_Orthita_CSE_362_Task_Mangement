@@ -1,18 +1,11 @@
-const express = require("express");
+const express = require('express');
 const app = express();
+const taskRoutes = require('./routes/tasks'); // updated path
 
-const tasksRouter = require("./routes/tasks");
+app.use(express.json()); // Parse JSON bodies
+app.use('/tasks', taskRoutes); // Mount task routes
 
-app.use("/tasks", tasksRouter);
-
-app.get("/", (req, res) => {
-  res.send("Welcome to Task API!");
-});
-
-app.get("/health", (req, res) => {
-  res.json({ status: "healthy", uptime: process.uptime() });
-});
-
-app.listen(3000, () => {
-  console.log("✅ Server running on http://localhost:3000");
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
