@@ -2,30 +2,31 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../config/db');
 
-// GET all tasks with pagination
+// GET all tasks with pagination and optional search
 router.get('/', async (req, res) => {
   try {
-    // Read query parameters
-    let page = parseInt(req.query.page) || 1;   // default page = 1
-    let limit = parseInt(req.query.limit) || 10; // default limit = 10
-
-    if (limit > 50) limit = 50; // maximum limit = 50
+    let page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    if (limit > 50) limit = 50;
     if (page < 1) page = 1;
-
     const offset = (page - 1) * limit;
 
-    // Count total tasks
-    const [countRows] = await db.query('SELECT COUNT(*) AS total FROM tasks');
+    const searchTerm = req.query.q ? `%${req.query.q}%` : '%';
+
+    // Count total tasks matching search
+    const [countRows] = await db.query(
+      'SELECT COUNT(*) AS total FROM tasks WHERE title LIKE ?',
+      [searchTerm]
+    );
     const totalTasks = countRows[0].total;
     const totalPages = Math.ceil(totalTasks / limit);
 
-    // Fetch tasks with limit and offset
+    // Fetch tasks matching search with limit and offset
     const [rows] = await db.query(
-      'SELECT * FROM tasks ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [limit, offset]
+      'SELECT * FROM tasks WHERE title LIKE ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
+      [searchTerm, limit, offset]
     );
 
-    // Response with metadata
     res.json({
       totalTasks,
       totalPages,
